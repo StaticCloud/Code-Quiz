@@ -1,12 +1,18 @@
+:root {
+    --background-color: #ececec;
+    --primary-color: rgb(73,73,73);
+    --secondary-color: rgb(138,138,138);
+}
+
 * {
     margin: 0;
     padding: 0;
-    color: white;
-    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    color: var(--primary-color);
+    font-family: sans-serif;
 }
 
 body {
-    background-color: #2f9250;
+    background-color: var(--background-color);
     margin: 0 auto;
     width: 910px;
 }
@@ -15,4 +21,35 @@ header {
     margin: 35px 0;
     display: flex;
     justify-content: space-between;
+}
+
+button {
+    padding: 8px;
+    width: 80px;
+}
+
+/* style the page when our welcome page is present */
+.page-container[data-page="welcome"] {
+    width: 500px;
+    padding: 9px;
+    border-left: var(--secondary-color) solid 4px;
+}
+
+/* style paragraph elements inside our container */
+.page-container[data-page="welcome"] p {
+    margin: 15px 0;
+}
+
+
+/* style button inside page container */
+.page-container[data-page="welcome"] button {
+    background-color: var(--background-color);
+    border: 1px solid var(--primary-color);
+    border-radius: 8px;
+}
+
+/* on hover... */
+.page-container[data-page="welcome"] button:hover {
+    color: var(--background-color);
+    background-color: var(--primary-color);
 }
