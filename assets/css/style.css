@@ -53,3 +53,30 @@ button {
     color: var(--background-color);
     background-color: var(--primary-color);
 }
+
+/* style the page when our quiz page is present */ 
+
+/* style the answers */
+.page-container[data-page="quiz"] p {
+    margin: 20px 0;
+    width: fit-content;
+    border-bottom: var(--background-color) solid 2px;
+}
+
+.page-container[data-page="quiz"] p:hover {
+    cursor: pointer;
+    border-bottom: var(--primary-color) solid 2px;
+}
+
+/* style the correct/incorrect text */
+div[data-was-correct] {
+    border-top: 1px solid var(--primary-color);
+}
+
+div[data-was-correct="true"] p i {
+    color: green;
+}
+
+div[data-was-correct="false"] p i {
+    color: red;
+}
