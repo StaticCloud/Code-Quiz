@@ -23,13 +23,14 @@ header {
     justify-content: space-between;
 }
 
-button {
+button, input[type="submit"] {
     padding: 8px;
     width: 80px;
 }
 
-/* style the page when our welcome page is present */
-.page-container[data-page="welcome"] {
+/* style the page when our welcome page and our complete page is present */
+.page-container[data-page="welcome"], 
+.page-container[data-page="complete"] {
     width: 500px;
     padding: 9px;
     border-left: var(--secondary-color) solid 4px;
@@ -42,14 +43,16 @@ button {
 
 
 /* style button inside page container */
-.page-container[data-page="welcome"] button {
+.page-container[data-page="welcome"] button, 
+.page-container[data-page="complete"] form input[type="submit"] {
     background-color: var(--background-color);
     border: 1px solid var(--primary-color);
     border-radius: 8px;
 }
 
 /* on hover... */
-.page-container[data-page="welcome"] button:hover {
+.page-container[data-page="welcome"] button:hover,
+.page-container[data-page="complete"] form input[type="submit"]:hover {
     color: var(--background-color);
     background-color: var(--primary-color);
 }
@@ -79,4 +82,14 @@ div[data-was-correct="true"] p i {
 
 div[data-was-correct="false"] p i {
     color: red;
+}
+
+/* style page when quiz is complete */
+.page-container[data-page="complete"] form input[type="submit"],
+.page-container[data-page="complete"] form {
+    margin-top: 20px;
+}
+
+.page-container[data-page="complete"] form input[type="submit"] {
+    display: flex;
 }

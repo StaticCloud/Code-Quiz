@@ -20,6 +20,9 @@ var setPage = function(page) {
         case("quiz"):
             renderQuizPage(quizQuestion);
             break;
+        case("complete"):
+            renderCompletionPage();
+            break;
     }
 }
 
@@ -76,6 +79,7 @@ var renderQuizPage = function(quizQuestion) {
 
     // display "correct" or "incorrect depending on what value wasCorrect is"
     wasCorrectEl.setAttribute("data-was-correct", wasCorrect);
+
     if (wasCorrect == "true") {
         wasCorrectEl.innerHTML = "<p><i>Correct</i></p>";
     } else if (wasCorrect == "false") {    
@@ -89,7 +93,54 @@ var renderQuizPage = function(quizQuestion) {
 
 }
 
+var renderCompletionPage = function() {
+
+    // clear the page
+    containerEl.innerHTML = "";
+
+    // set the data-page attribute to complete
+    containerEl.setAttribute("data-page", "complete");
+
+    // render the heading text which displays the final score
+    var headingTextEl = document.createElement("h1");
+    headingTextEl.innerHTML = "<i>Final Score:</i>";
+
+    // create our form, including the label text, the textbox, and our submit button
+    var leaderboardFormEl = document.createElement("form");
+    leaderboardFormEl.setAttribute("action", "submit");
+    
+    var nameLabelEl = document.createElement("label")
+    nameLabelEl.setAttribute("for", "name");
+    nameLabelEl.innerHTML = "Enter your name to save your score: ";
+
+    var nameInputEl = document.createElement("input");
+    nameInputEl.setAttribute("type", "text");
+    nameInputEl.setAttribute("name", "name");
+
+    var submitEl = document.createElement("input");
+    submitEl.setAttribute("type", "submit");
+    submitEl.setAttribute("value", "Submit");
+
+    // append the new elements to the appropriate parents
+    leaderboardFormEl.appendChild(nameLabelEl);
+    leaderboardFormEl.appendChild(nameInputEl);
+    leaderboardFormEl.appendChild(submitEl);
+
+    // append our form and header to container
+    containerEl.appendChild(headingTextEl);
+    containerEl.appendChild(leaderboardFormEl);
+
+    // add event listener the submit button
+    leaderboardFormEl.addEventListener("submit", renderCompletionPage);
+}
+
+// renders leaderboard page
+var renderLeaderboardPage = function(event) {
+    event.preventDefault();
+}
+
 var handleClicks = function(event) {
+
     // get the element clicked on my the user
     var targetEl = event.target;
     
@@ -116,7 +167,7 @@ var handleClicks = function(event) {
 
         // if the value of quizQuestion is greater than the available questions...
         if (quizQuestion >= questions.length) {
-            containerEl.innerHTML = "Quiz Finished"; // placeholder
+            setPage("complete");
         } else {
             // update the quiz page
             setPage("quiz");
@@ -124,6 +175,6 @@ var handleClicks = function(event) {
     }
 }
 
-setPage("welcome");
+setPage("complete");
 
 containerEl.addEventListener("click", handleClicks);
