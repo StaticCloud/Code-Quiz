@@ -3,6 +3,12 @@ var containerEl = document.querySelector(".page-container");
 var quizQuestion = 0;
 var wasCorrect = "";
 
+// time-related variables, including interval, timer element, and limit
+var interval;
+var timerEl = document.querySelector("#timer");
+var timeLimit = 60;
+timerEl.innerHTML = timeLimit;
+
 // questions array, five questions, four options, first element of each array is the question with index 1-4 being answers and index 5 storing the index of the correct answer
 var questions = [["JSON is...", "A character from Friday the 13th.", "A file format used for storing and retrieving data.", "A JavaScript library that makes animating HTML elements much easier.", "An object-oriented programming language.", 2],
                 ["DOM means...", "Don't Order Mozzarella", "Directly Overclocked Motherboard", "Deficit Oriented Management", "Document Object Model", 4],
@@ -54,6 +60,7 @@ var renderWelcomePage = function() {
 
 // render our primary quiz page
 var renderQuizPage = function(quizQuestion) {
+
     // remove all elements inside containerEl if there are any
     containerEl.innerHTML = "";
 
@@ -82,7 +89,9 @@ var renderQuizPage = function(quizQuestion) {
 
     if (wasCorrect == "true") {
         wasCorrectEl.innerHTML = "<p><i>Correct</i></p>";
-    } else if (wasCorrect == "false") {    
+    } else if (wasCorrect == "false") {
+        // if the user guesses incorrectly, reduce the time by 5
+        timeLimit = timeLimit - 5;
         wasCorrectEl.innerHTML = "<p><i>Incorrect</i></p>";
     } else {
         wasCorrectEl.innerHTML = "";
@@ -90,10 +99,12 @@ var renderQuizPage = function(quizQuestion) {
 
     // finally, append to container
     containerEl.appendChild(wasCorrectEl);
-
 }
 
 var renderCompletionPage = function() {
+
+    // because our quiz is complete, the timer must stop
+    clearInterval(interval);
 
     // clear the page
     containerEl.innerHTML = "";
@@ -103,7 +114,7 @@ var renderCompletionPage = function() {
 
     // render the heading text which displays the final score
     var headingTextEl = document.createElement("h1");
-    headingTextEl.innerHTML = "<i>Final Score:</i>";
+    headingTextEl.innerHTML = "<i>Final Score: " + timeLimit + "</i>";
 
     // create our form, including the label text, the textbox, and our submit button
     var leaderboardFormEl = document.createElement("form");
@@ -147,6 +158,9 @@ var handleClicks = function(event) {
     // load the quiz page once the user hits the start button
     if (targetEl.matches("#start-button")) {
         setPage("quiz");
+        
+        // initialize our interval
+        interval = setInterval(countdown, 1000);
     }
 
     // if the user selects an answer to a question
@@ -175,6 +189,23 @@ var handleClicks = function(event) {
     }
 }
 
-setPage("complete");
+// our countdown function, gets called after every second
+var countdown = function() {
+    if (timeLimit > 1) {
+        timeLimit = timeLimit - 1;
+        timerEl.innerHTML = timeLimit;
+    } else {
+
+        // this might seem unneeded, but this is included to prevent a bug where -1 is displayed as the final score
+        timeLimit = 0;
+        timerEl.innerHTML = timeLimit;
+
+        // clear our interval and go to post-game page
+        clearInterval(interval);
+        setPage("complete");
+    }
+}
+
+setPage("welcome");
 
 containerEl.addEventListener("click", handleClicks);
