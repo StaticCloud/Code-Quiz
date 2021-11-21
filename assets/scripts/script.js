@@ -1,13 +1,17 @@
 // get the container element
 var containerEl = document.querySelector(".page-container");
+var leaderboardEl = document.querySelector("#leaderboard");
 var quizQuestion = 0;
 var wasCorrect = "";
+
+// array for high scores
+var scores = [];
 
 // time-related variables, including interval, timer element, and limit
 var interval;
 var timerEl = document.querySelector("#timer");
 var timeLimit = 60;
-timerEl.innerHTML = timeLimit;
+timerEl.innerHTML = "Time left: " + timeLimit;
 
 // questions array, five questions, four options, first element of each array is the question with index 1-4 being answers and index 5 storing the index of the correct answer
 var questions = [["JSON is...", "A character from Friday the 13th.", "A file format used for storing and retrieving data.", "A JavaScript library that makes animating HTML elements much easier.", "An object-oriented programming language.", 2],
@@ -28,6 +32,9 @@ var setPage = function(page) {
             break;
         case("complete"):
             renderCompletionPage();
+            break;
+        case("leaderboard"):
+            renderLeaderboardPage();
             break;
     }
 }
@@ -101,6 +108,7 @@ var renderQuizPage = function(quizQuestion) {
     containerEl.appendChild(wasCorrectEl);
 }
 
+// render the completion page
 var renderCompletionPage = function() {
 
     // because our quiz is complete, the timer must stop
@@ -114,6 +122,16 @@ var renderCompletionPage = function() {
 
     // render the heading text which displays the final score
     var headingTextEl = document.createElement("h1");
+
+    // this code is included because if the last answer was incorrect, the player wouldn't lose points, so we do it manually here
+    if (wasCorrect === "false") {
+        timeLimit = timeLimit - 5;
+        if (timeLimit < 0) {
+            timeLimit = 0;
+        }
+        timerEl.innerHTML = timeLimit;
+    }
+
     headingTextEl.innerHTML = "<i>Final Score: " + timeLimit + "</i>";
 
     // create our form, including the label text, the textbox, and our submit button
@@ -122,7 +140,7 @@ var renderCompletionPage = function() {
     
     var nameLabelEl = document.createElement("label")
     nameLabelEl.setAttribute("for", "name");
-    nameLabelEl.innerHTML = "Enter your name to save your score: ";
+    nameLabelEl.innerHTML = "Enter your initials to save your score: ";
 
     var nameInputEl = document.createElement("input");
     nameInputEl.setAttribute("type", "text");
@@ -142,14 +160,91 @@ var renderCompletionPage = function() {
     containerEl.appendChild(leaderboardFormEl);
 
     // add event listener the submit button
-    leaderboardFormEl.addEventListener("submit", renderCompletionPage);
+    leaderboardFormEl.addEventListener("submit", renderLeaderboardPageSubmit);
 }
 
 // renders leaderboard page
-var renderLeaderboardPage = function(event) {
+var renderLeaderboardPageSubmit = function(event) {
     event.preventDefault();
+
+    var player = {
+        initials: containerEl.querySelector("input[type=text]").value,
+        score: timeLimit
+    }
+
+    if (!player.initials) {
+        window.alert("Please enter your initials if you wish to save your score.");
+        return;
+    } else {
+        scores.push(player);
+
+        // sort the scores array in order of highest to lowest
+        scores.sort(function(a, b) { return (b.score - a.score)});
+        
+        // then save the score array
+        saveScore(player);
+    }
+
+    renderLeaderboardPage();
 }
 
+// render our leaderboard page
+var renderLeaderboardPage = function() {
+    // reset the html
+    containerEl.innerHTML = "";
+
+    // since the user can access the leaderboard at any point, it's appropriate to reset the timer to make things fair
+    timeLimit = 60;
+    timerEl.innerHTML = "Time left: " + timeLimit;
+
+    // clear our interval, if any
+    clearInterval(interval);
+
+    // set the page data to leaderboard
+    containerEl.setAttribute("data-page", "leaderboard");
+
+    // create a heading and our list for our playerboard page
+    var leaderboardHeadingEl = document.createElement("h1");
+    leaderboardHeadingEl.innerHTML = "<i>High Scores:</i>"
+
+    var playerListEl = document.createElement("ul");
+    playerListEl.setAttribute("class", "player-list");
+
+    containerEl.appendChild(leaderboardHeadingEl);
+    containerEl.appendChild(playerListEl);
+
+    // finally load the list of scores..
+    // ..if the list is not empty
+    if (scores.length != 0) {
+        // create li elements for every player
+        for (var i = 0; i < scores.length; i++) {
+            var playerEl = document.createElement("li");
+            playerEl.innerHTML = "<i>" + scores[i].initials + " - " + scores[i].score + "</i>";
+            playerListEl.appendChild(playerEl);
+        }
+
+    // render the html when there are no players to display
+    } else {
+        var noScoresEl = document.createElement("p");
+        noScoresEl.innerHTML = "No high scores to display."
+        containerEl.appendChild(noScoresEl);
+    }
+
+    // create the button that redirects you to the main page
+    var mainPageButtonEl = document.createElement("button");
+    mainPageButtonEl.setAttribute("id", "main-page-button");
+    mainPageButtonEl.textContent = "Main Page";
+
+    // create the button that resets the list of high scores
+    var resetLeaderboardButtonEl = document.createElement("button");
+    resetLeaderboardButtonEl.setAttribute("id", "reset-leaderboard-button");
+    resetLeaderboardButtonEl.textContent = "Reset";
+
+    containerEl.appendChild(mainPageButtonEl);
+    containerEl.appendChild(resetLeaderboardButtonEl);
+}
+
+// handles clicks of elements inside containerEl
 var handleClicks = function(event) {
 
     // get the element clicked on my the user
@@ -157,6 +252,12 @@ var handleClicks = function(event) {
     
     // load the quiz page once the user hits the start button
     if (targetEl.matches("#start-button")) {
+
+        // reset what question we're on to avoid errors
+        quizQuestion = 0;
+        wasCorrect = "";
+
+        // go to the quiz page
         setPage("quiz");
         
         // initialize our interval
@@ -187,18 +288,29 @@ var handleClicks = function(event) {
             setPage("quiz");
         }
     }
+
+    // if the user chooses to return to the welcome page on the leaderboard page
+    if (targetEl.matches("#main-page-button")) {
+        setPage("welcome");
+    }
+
+    if (targetEl.matches("#reset-leaderboard-button")) {
+        scores = [];
+        saveScore();
+        setPage("leaderboard");
+    }
 }
 
 // our countdown function, gets called after every second
 var countdown = function() {
     if (timeLimit > 1) {
         timeLimit = timeLimit - 1;
-        timerEl.innerHTML = timeLimit;
+        timerEl.innerHTML = "Time left: " + timeLimit;
     } else {
 
         // this might seem unneeded, but this is included to prevent a bug where -1 is displayed as the final score
         timeLimit = 0;
-        timerEl.innerHTML = timeLimit;
+        timerEl.innerHTML = "Time left: " + timeLimit;
 
         // clear our interval and go to post-game page
         clearInterval(interval);
@@ -206,6 +318,22 @@ var countdown = function() {
     }
 }
 
+// function to save a player's score
+var saveScore = function() {
+    localStorage.setItem("scores", JSON.stringify(scores));
+}
+
+// function to load scores
+var loadScore = function() {
+    scores = localStorage.getItem("scores");
+    scores = JSON.parse(scores);
+}
+
+// save the score
+loadScore();
+
+// set the page to the welcome page
 setPage("welcome");
 
 containerEl.addEventListener("click", handleClicks);
+leaderboardEl.addEventListener("click", renderLeaderboardPage);
