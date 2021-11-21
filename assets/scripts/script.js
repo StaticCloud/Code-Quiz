@@ -176,6 +176,12 @@ var renderLeaderboardPageSubmit = function(event) {
         window.alert("Please enter your initials if you wish to save your score.");
         return;
     } else {
+
+        // scores would sometimes return null and the player wouldn't be pushed to the list
+        if (scores === null) {
+            scores = [];
+        }
+
         scores.push(player);
 
         // sort the scores array in order of highest to lowest
@@ -325,13 +331,6 @@ var saveScore = function() {
 
 // function to load scores
 var loadScore = function() {
-    
-    // scores would sometimes return null and the player wouldn't be pushed to the list
-    if (scores == null) {
-        scores = [];
-        return false;
-    }
-
     scores = localStorage.getItem("scores");
     scores = JSON.parse(scores);
 }
