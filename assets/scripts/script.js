@@ -325,6 +325,13 @@ var saveScore = function() {
 
 // function to load scores
 var loadScore = function() {
+    
+    // scores would sometimes return null and the player wouldn't be pushed to the list
+    if (scores == null) {
+        scores = [];
+        return false;
+    }
+
     scores = localStorage.getItem("scores");
     scores = JSON.parse(scores);
 }
