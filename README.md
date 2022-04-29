@@ -8,3 +8,9 @@ A simple quiz application that included a leaderboard. The quiz consists of 5 qu
 ## Links
 
 [Deployed Page](https://staticcloud.github.io/Code-Quiz/)
+
+## Overview
+
+Here's a high-level overview of how the app works!
+
+![overview](./assets/images/CodeQuizOverview.png)
